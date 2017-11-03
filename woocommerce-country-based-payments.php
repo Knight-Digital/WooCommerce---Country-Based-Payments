@@ -9,7 +9,7 @@ Author URI:  https://knightdigital.se
 License:     GPL2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Domain Path: /languages
-Text Domain: wccbp
+Text Domain: kd_wccbp
 
 Forked from the https://wordpress.org/plugins/woocommerce-country-based-payments/ plugin
 Original Author: Ivan Paulin - http://ivanpaulin.com
