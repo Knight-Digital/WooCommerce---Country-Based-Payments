@@ -32,20 +32,7 @@ class WoocommerceCountryBasedPayment {
     public function __construct()
     {
         $this->id = 'wccbp';
-
         add_action('woocommerce_loaded', array($this, 'loadSettings'));
-
-        add_action('woocommerce_checkout_update_order_review', array($this, 'setSelectedCountry'), 10);
-
-        // check if ajax request
-        if(!is_admin() && (isset($_REQUEST['wc-ajax']) && 'update_order_review' == $_REQUEST['wc-ajax'])) {
-            add_filter( 'woocommerce_available_payment_gateways', array($this, 'availablePaymentGateways'), 10, 1 );
-        }
-
-        // check if pay_for page
-        if( !is_admin() && isset( $_GET['pay_for_order'] ) &&  true == $_GET['pay_for_order'] ) {
-            add_filter( 'woocommerce_available_payment_gateways', array( $this, 'available_payment_gateways_after_cancelation'), 10, 1 );
-        }
     }
 
 
@@ -89,29 +76,6 @@ class WoocommerceCountryBasedPayment {
         }
 
         return $payment_gateways;
-    }
-
-    /**
-     * List through available payment gateways,
-     * if customer gets redirected to the pay_for page
-     * after a payment cancellation
-     *
-     * @return array with updated list of available payment gateways
-     */
-    public function available_payment_gateways_after_cancelation( $payment_gateways )
-    {
-    	$order_id = wc_get_order_id_by_order_key( $_GET['key'] );
-    	$order = new WC_Order($order_id);
-			$billing_address = $order->get_address();
-			$this->selected_country = $billing_address['country'];
-
-			foreach ( $payment_gateways as $gateway ) {
-				if ( get_option( $this->id . '_' . $gateway->id ) && !in_array( $this->selected_country, get_option( $this->id . '_' . $gateway->id ) ) ) {
-					unset( $payment_gateways[$gateway->id] );
-				}
-			}
-
-			return $payment_gateways;
     }
 }
 
