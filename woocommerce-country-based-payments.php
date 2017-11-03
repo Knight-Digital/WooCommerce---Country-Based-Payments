@@ -16,7 +16,7 @@ Original Author: Ivan Paulin - http://ivanpaulin.com
 */
 
 if ( ! defined( 'ABSPATH' ) ) {
-	exit;
+    exit;
 }
 
 // define text domain
@@ -28,11 +28,13 @@ class WoocommerceCountryBasedPayment {
     private $selected_country;
 
     private $id;
-
     public function __construct()
     {
         $this->id = 'wccbp';
+        add_action('woocommerce_init', array($this, 'loadCustomerCountry'), 10);
         add_action('woocommerce_loaded', array($this, 'loadSettings'));
+        add_action('wccbp_update_country', array($this, 'setSelectedCountry'), 10, 1);
+        add_action('wccbp_filter_gateways', array($this, 'availablePaymentGateways'), 10, 2);
     }
 
 
@@ -42,6 +44,13 @@ class WoocommerceCountryBasedPayment {
     public function loadSettings()
     {
         new WCCBPSettings();
+    }
+
+    /**
+     * Get customer country
+     */
+    public function loadCustomerCountry() {
+        $this->setSelectedCountry(WC()->customer->get_shipping_country());
     }
 
 
@@ -67,12 +76,18 @@ class WoocommerceCountryBasedPayment {
      *
      * @return array with updated list of available payment gateways
      */
-    public function availablePaymentGateways($payment_gateways)
+    public function availablePaymentGateways($payment_gateways, $callback = null)
     {
         foreach ($payment_gateways as $gateway) {
             if(get_option($this->id . '_' . $gateway->id) && !in_array($this->selected_country, get_option($this->id . '_' . $gateway->id))) {
                 unset($payment_gateways[$gateway->id]);
             }
+        }
+
+        // return $payment_gateways;
+
+        if ($callback !== null) {
+            $callback($payment_gateways);
         }
 
         return $payment_gateways;
