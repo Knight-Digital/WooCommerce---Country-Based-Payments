@@ -60,9 +60,13 @@ class WoocommerceCountryBasedPayment {
      * Country code is used.
      *
      */
-    public function setSelectedCountry()
+    public function setSelectedCountry($country = null)
     {
-        $this->selected_country = sanitize_text_field($_REQUEST['country']);
+        $country_code = $country !== null ? $country : (isset($_REQUEST['country']) ? $_REQUEST['country'] : false);
+
+        if ($country_code) {
+            $this->selected_country = sanitize_text_field($country_code);
+        }
     }
 
 
