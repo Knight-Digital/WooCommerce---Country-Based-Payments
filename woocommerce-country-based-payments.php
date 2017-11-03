@@ -50,7 +50,9 @@ class WoocommerceCountryBasedPayment {
      * Get customer country
      */
     public function loadCustomerCountry() {
-        $this->setSelectedCountry(WC()->customer->get_shipping_country());
+        if (WC()->customer) {
+            $this->selected_country = WC()->customer->get_shipping_country();
+        }
     }
 
 
